@@ -1,0 +1,7 @@
+click==7.*
+h11==0.8.*
+websockets==7.*
+
+[:sys_platform != "win32" and sys_platform != "cygwin" and platform_python_implementation != "pypy"]
+httptools==0.0.13
+uvloop==0.12.*

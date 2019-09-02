@@ -1,0 +1,687 @@
+Metadata-Version: 2.1
+Name: pydantic
+Version: 0.30
+Summary: Data validation and settings management using python 3.6 type hinting
+Home-page: https://github.com/samuelcolvin/pydantic
+Author: Samuel Colvin
+Author-email: s@muelcolvin.com
+License: MIT
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: Unix
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Environment :: Console
+Classifier: Environment :: MacOS X
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Internet
+Requires-Python: >=3.6
+Requires-Dist: dataclasses (>=0.6) ; python_version < "3.7"
+Provides-Extra: email
+Requires-Dist: email-validator (>=1.0.3) ; extra == 'email'
+Provides-Extra: typing_extensions
+Requires-Dist: typing-extensions (>=3.7.2) ; extra == 'typing_extensions'
+Provides-Extra: ujson
+Requires-Dist: ujson (>=1.35) ; extra == 'ujson'
+
+pydantic
+========
+
+|BuildStatus| |Coverage| |pypi| |CondaForge| |downloads| |versions| |license|
+
+Data validation and settings management using Python type hinting.
+
+Fast and extensible, *pydantic* plays nicely with your linters/IDE/brain.
+Define how data should be in pure, canonical Python 3.6+; validate it with *pydantic*.
+
+
+Help
+----
+
+See `documentation`_ for more details.
+
+
+Installation
+------------
+
+Install using ``pip install -U pydantic`` or ``conda install pydantic -c conda-forge``.
+For more installation options to make *pydantic* even faster, see `Install`_ section in the documentation.
+
+
+A Simple Example
+----------------
+
+.. code-block:: python
+
+    from datetime import datetime
+    from typing import List
+    from pydantic import BaseModel
+
+    class User(BaseModel):
+        id: int
+        name = 'John Doe'
+        signup_ts: datetime = None
+        friends: List[int] = []
+
+    external_data = {'id': '123', 'signup_ts': '2017-06-01 12:22', 'friends': [1, '2', b'3']}
+    user = User(**external_data)
+    print(user)
+    # > User id=123 name='John Doe' signup_ts=datetime.datetime(2017, 6, 1, 12, 22) friends=[1, 2, 3]
+    print(user.id)
+    # > 123
+
+
+Contributing
+------------
+
+For guidance on setting up a development environment and how to make a
+contribution to *pydantic*, see the `Contributing to Pydantic`_.
+
+
+.. |BuildStatus| image:: https://travis-ci.org/samuelcolvin/pydantic.svg?branch=master
+   :target: https://travis-ci.org/samuelcolvin/pydantic
+.. |Coverage| image:: https://codecov.io/gh/samuelcolvin/pydantic/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/samuelcolvin/pydantic
+.. |pypi| image:: https://img.shields.io/pypi/v/pydantic.svg
+   :target: https://pypi.python.org/pypi/pydantic
+.. |CondaForge| image:: https://img.shields.io/conda/v/conda-forge/pydantic.svg
+   :target: https://anaconda.org/conda-forge/pydantic
+.. |downloads| image:: https://img.shields.io/pypi/dm/pydantic.svg
+   :target: https://pypistats.org/packages/pydantic
+.. |versions| image:: https://img.shields.io/pypi/pyversions/pydantic.svg
+   :target: https://github.com/samuelcolvin/pydantic
+.. |license| image:: https://img.shields.io/github/license/samuelcolvin/pydantic.svg
+   :target: https://github.com/samuelcolvin/pydantic/blob/master/LICENSE
+.. _documentation: https://pydantic-docs.helpmanual.io/
+.. _Install: https://pydantic-docs.helpmanual.io/#install
+.. _Contributing to Pydantic: https://pydantic-docs.helpmanual.io/#contributing-to-pydantic
+
+
+.. :changelog:
+
+History
+-------
+
+v0.30 (2019-07-07)
+..................
+* enforce single quotes in code, `#612`_ by `@samuelcolvin`_
+* fix infinite recursion with dataclass inheritance and ``__post_init__``, `#606`_ by `@Hanaasagi`_
+* fix default values for ``GenericModel``, `#610`_ by `@dmontagu`_
+* clarify that self-referencing models require python 3.7+, `#616`_ by `@vlcinsky`_
+* fix truncate for types, `#611`_ by `@dmontagu`_
+* add ``alias_generator`` support, `#622`_ by `@MrMrRobat`_
+* fix unparameterized generic type schema generation, `#625`_ by `@dmontagu`_
+* fix schema generation with multiple/circular references to the same model, `#621`_ by `@tiangolo`_ and `@wongpat`_
+* support custom root types, `#628`_ by `@koxudaxi`_
+* support ``self`` as a field name in ``parse_obj``, `#632`_ by `@samuelcolvin`_
+
+v0.29 (2019-06-19)
+..................
+* support dataclasses.InitVar, `#592`_ by `@pfrederiks`_
+* Updated documentation to elucidate the usage of ``Union`` when defining multiple types under an attribute's
+  annotation and showcase how the type-order can affect marshalling of provided values, `#594`_ by `@somada141`_
+* add ``conlist`` type, `#583`_ by `@hmvp`_
+* add support for generics, `#595`_ by `@dmontagu`_
+
+v0.28 (2019-06-06)
+..................
+* fix support for JSON Schema generation when using models with circular references in Python 3.7, `#572`_ by `@tiangolo`_
+* support ``__post_init_post_parse__`` on dataclasses, `#567`_ by `@sevaho`_
+* allow dumping dataclasses to JSON, `#575`_ by `@samuelcolvin`_ and `@DanielOberg`_
+* ORM mode, `#562`_ by `@samuelcolvin`_
+* fix ``pydantic.compiled`` on ipython, `#573`_ by `@dmontagu`_ and `@samuelcolvin`_
+* add ``StrictBool`` type, `#579`_ by `@cazgp`_
+
+v0.27 (2019-05-30)
+..................
+* **breaking change**  ``_pydantic_post_init`` to execute dataclass' original ``__post_init__`` before
+  validation, `#560`_ by `@HeavenVolkoff`_
+* fix handling of generic types without specified parameters, `#550`_ by `@dmontagu`_
+* **breaking change** (maybe): this is the first release compiled with **cython**, see the docs and please
+  submit an issue if you run into problems
+
+v0.27.0a1 (2019-05-26)
+......................
+* fix JSON Schema for ``list``, ``tuple``, and ``set``, `#540`_ by `@tiangolo`_
+* compiling with cython, ``manylinux`` binaries, some other performance improvements, `#548`_ by `@samuelcolvin`_
+
+v0.26 (2019-05-22)
+..................
+* fix to schema generation for ``IPvAnyAddress``, ``IPvAnyInterface``, ``IPvAnyNetwork`` `#498`_ by `@pilosus`_
+* fix variable length tuples support, `#495`_ by `@pilosus`_
+* fix return type hint for ``create_model``, `#526`_ by `@dmontagu`_
+* **Breaking Change:** fix ``.dict(skip_keys=True)`` skipping values set via alias (this involves changing
+  ``validate_model()`` to always returns ``Tuple[Dict[str, Any], Set[str], Optional[ValidationError]]``), `#517`_ by `@sommd`_
+* fix to schema generation for ``IPv4Address``, ``IPv6Address``, ``IPv4Interface``,
+  ``IPv6Interface``, ``IPv4Network``, ``IPv6Network`` `#532`_ by `@euri10`_
+* add ``Color`` type, `#504`_ by `@pilosus`_ and `@samuelcolvin`_
+
+v0.25 (2019-05-05)
+..................
+* Improve documentation on self-referencing models and annotations, `#487`_ by `@theenglishway`_
+* fix ``.dict()`` with extra keys, `#490`_ by `@JaewonKim`_
+* support ``const`` keyword in ``Schema``, `#434`_ by `@Sean1708`_
+
+v0.24 (2019-04-23)
+..................
+* fix handling ``ForwardRef`` in sub-types, like ``Union``, `#464`_ by `@tiangolo`_
+* fix secret serialization, `#465`_ by `@atheuz`_
+* Support custom validators for dataclasses, `#454`_ by `@primal100`_
+* fix ``parse_obj`` to cope with dict-like objects, `#472`_ by `@samuelcolvin`_
+* fix to schema generation in nested dataclass-based models, `#474`_ by `@NoAnyLove`_
+* fix ``json`` for ``Path``, ``FilePath``, and ``DirectoryPath`` objects, `#473`_ by `@mikegoodspeed`_
+
+v0.23 (2019-04-04)
+..................
+* improve documentation for contributing section, `#441`_ by `@pilosus`_
+* improve README.rst to include essential information about the package, `#446`_ by `@pilosus`_
+* ``IntEnum`` support, `#444`_ by `@potykion`_
+* fix PyObject callable value, `#409`_ by `@pilosus`_
+* fix ``black`` deprecation warnings after update, `#451`_ by `@pilosus`_
+* fix ``ForwardRef`` collection bug, `#450`_ by `@tigerwings`_
+* Support specialized ``ClassVars``, `#455`_ by `@tyrylu`_
+* fix JSON serialization for ``ipaddress`` types, `#333`_ by `@pilosus`_
+* add ``SecretStr`` and ``SecretBytes`` types, `#452`_ by `@atheuz`_
+
+v0.22 (2019-03-29)
+..................
+* add ``IPv{4,6,Any}Network`` and ``IPv{4,6,Any}Interface`` types from ``ipaddress`` stdlib, `#333`_ by `@pilosus`_
+* add docs for ``datetime`` types, `#386`_ by `@pilosus`_
+* fix to schema generation in dataclass-based models, `#408`_ by `@pilosus`_
+* fix path in nested models, `#437`_ by `@kataev`_
+* add ``Sequence`` support, `#304`_ by `@pilosus`_
+
+v0.21.0 (2019-03-15)
+....................
+* fix typo in ``NoneIsNotAllowedError`` message, `#414`_ by `@YaraslauZhylko`_
+* add ``IPvAnyAddress``, ``IPv4Address`` and ``IPv6Address`` types, `#333`_ by `@pilosus`_
+
+v0.20.1 (2019-02-26)
+....................
+* fix type hints of ``parse_obj`` and similar methods, `#405`_ by `@erosennin`_
+* fix submodel validation, `#403`_ by `@samuelcolvin`_
+* correct type hints for ``ValidationError.json``, `#406`_ by `@layday`_
+
+v0.20.0 (2019-02-18)
+....................
+* fix tests for python 3.8, `#396`_ by `@samuelcolvin`_
+* Adds fields to the ``dir`` method for autocompletion in interactive sessions, `#398`_ by `@dgasmith`_
+* support ``ForwardRef`` (and therefore ``from __future__ import annotations``) with dataclasses, `#397`_ by `@samuelcolvin`_
+
+v0.20.0a1 (2019-02-13)
+......................
+* **breaking change** (maybe): more sophisticated argument parsing for validators, any subset of
+  ``values``, ``config`` and ``field`` is now permitted, eg. ``(cls, value, field)``,
+  however the variadic key word argument ("``**kwargs``") **must** be called ``kwargs``, `#388`_ by `@samuelcolvin`_
+* **breaking change**: Adds ``skip_defaults`` argument to ``BaseModel.dict()`` to allow skipping of fields that
+  were not explicitly set, signature of ``Model.construct()`` changed, `#389`_ by `@dgasmith`_
+* add ``py.typed`` marker file for PEP-561 support, `#391`_ by `@je-l`_
+* Fix ``extra`` behaviour for multiple inheritance/mix-ins, `#394`_ by `@YaraslauZhylko`_
+
+v0.19.0 (2019-02-04)
+....................
+* Support ``Callable`` type hint, fix `#279`_ by `@proofit404`_
+* Fix schema for fields with ``validator`` decorator, fix `#375`_ by `@tiangolo`_
+* Add ``multiple_of`` constraint to ``ConstrainedDecimal``, ``ConstrainedFloat``, ``ConstrainedInt``
+  and their related types ``condecimal``, ``confloat``, and ``conint`` `#371`_, thanks `@StephenBrown2`_
+* Deprecated ``ignore_extra`` and ``allow_extra`` Config fields in favor of ``extra``, `#352`_ by `@liiight`_
+* Add type annotations to all functions, test fully with mypy, `#373`_ by `@samuelcolvin`_
+* fix for 'missing' error with ``validate_all`` or ``validate_always``, `#381`_ by `@samuelcolvin`_
+* Change the second/millisecond watershed for date/datetime parsing to ``2e10``, `#385`_ by `@samuelcolvin`_
+
+v0.18.2 (2019-01-22)
+....................
+* Fix to schema generation with ``Optional`` fields, fix `#361`_ by `@samuelcolvin`_
+
+v0.18.1 (2019-01-17)
+....................
+* add ``ConstrainedBytes`` and ``conbytes`` types, `#315`_ `@Gr1N`_
+* adding ``MANIFEST.in`` to include license in package ``.tar.gz``, `#358`_ by `@samuelcolvin`_
+
+v0.18.0 (2019-01-13)
+....................
+* **breaking change**: don't call validators on keys of dictionaries, `#254`_ by `@samuelcolvin`_
+* Fix validators with ``always=True`` when the default is ``None`` or the type is optional, also prevent
+  ``whole`` validators being called for sub-fields, fix `#132`_ by `@samuelcolvin`_
+* improve documentation for settings priority and allow it to be easily changed, `#343`_ by `@samuelcolvin`_
+* fix ``ignore_extra=False`` and ``allow_population_by_alias=True``, fix `#257`_ by `@samuelcolvin`_
+* **breaking change**: Set ``BaseConfig`` attributes ``min_anystr_length`` and ``max_anystr_length`` to
+  ``None`` by default, fix `#349`_ in `#350`_ by `@tiangolo`_
+* add support for postponed annotations, `#348`_ by `@samuelcolvin`_
+
+v0.17.0 (2018-12-27)
+....................
+* fix schema for ``timedelta`` as number, `#325`_ by `@tiangolo`_
+* prevent validators being called repeatedly after inheritance, `#327`_ by `@samuelcolvin`_
+* prevent duplicate validator check in ipython, fix `#312`_ by `@samuelcolvin`_
+* add "Using Pydantic" section to docs, `#323`_ by `@tiangolo`_ & `#326`_ by `@samuelcolvin`_
+* fix schema generation for fields annotated as ``: dict``, ``: list``,
+  ``: tuple`` and ``: set``, `#330`_ & `#335`_ by `@nkonin`_
+* add support for constrained strings as dict keys in schema, `#332`_ by `@tiangolo`_
+* support for passing Config class in dataclasses decorator, `#276`_ by `@jarekkar`_
+  (**breaking change**: this supersedes the ``validate_assignment`` argument with ``config``)
+* support for nested dataclasses, `#334`_ by `@samuelcolvin`_
+* better errors when getting an ``ImportError`` with ``PyObject``, `#309`_ by `@samuelcolvin`_
+* rename ``get_validators`` to ``__get_validators__``, deprecation warning on use of old name, `#338`_ by `@samuelcolvin`_
+* support ``ClassVar`` by excluding such attributes from fields, `#184`_ by `@samuelcolvin`_
+
+v0.16.1 (2018-12-10)
+....................
+* fix ``create_model`` to correctly use the passed ``__config__``, `#320`_ by `@hugoduncan`_
+
+v0.16.0 (2018-12-03)
+....................
+* **breaking change**: refactor schema generation to be compatible with JSON Schema and OpenAPI specs, `#308`_ by `@tiangolo`_
+* add ``schema`` to ``schema`` module to generate top-level schemas from base models, `#308`_ by `@tiangolo`_
+* add additional fields to ``Schema`` class to declare validation for ``str`` and numeric values, `#311`_ by `@tiangolo`_
+* rename ``_schema`` to ``schema`` on fields, `#318`_ by `@samuelcolvin`_
+* add ``case_insensitive`` option to ``BaseSettings`` ``Config``, `#277`_ by `@jasonkuhrt`_
+
+v0.15.0 (2018-11-18)
+....................
+* move codebase to use black, `#287`_ by `@samuelcolvin`_
+* fix alias use in settings, `#286`_ by `@jasonkuhrt`_ and `@samuelcolvin`_
+* fix datetime parsing in ``parse_date``, `#298`_ by `@samuelcolvin`_
+* allow dataclass inheritance, fix `#293`_ by `@samuelcolvin`_
+* fix ``PyObject = None``, fix `#305`_ by `@samuelcolvin`_
+* allow ``Pattern`` type, fix `#303`_ by `@samuelcolvin`_
+
+v0.14.0 (2018-10-02)
+....................
+* dataclasses decorator, `#269`_ by `@Gaunt`_ and `@samuelcolvin`_
+
+v0.13.1 (2018-09-21)
+.....................
+* fix issue where int_validator doesn't cast a ``bool`` to an ``int`` `#264`_ by `@nphyatt`_
+* add deep copy support for ``BaseModel.copy()`` `#249`_, `@gangefors`_
+
+v0.13.0 (2018-08-25)
+.....................
+* raise an exception if a field's name shadows an existing ``BaseModel`` attribute `#242`_
+* add ``UrlStr`` and ``urlstr`` types `#236`_
+* timedelta json encoding ISO8601 and total seconds, custom json encoders `#247`_, by `@cfkanesan`_ and `@samuelcolvin`_
+* allow ``timedelta`` objects as values for properties of type ``timedelta`` (matches ``datetime`` etc. behavior) `#247`_
+
+v0.12.1 (2018-07-31)
+....................
+* fix schema generation for fields defined using ``typing.Any`` `#237`_
+
+v0.12.0 (2018-07-31)
+....................
+* add ``by_alias`` argument in ``.dict()`` and ``.json()`` model methods `#205`_
+* add Json type support `#214`_
+* support tuples `#227`_
+* major improvements and changes to schema `#213`_
+
+v0.11.2 (2018-07-05)
+....................
+* add ``NewType`` support `#115`_
+* fix ``list``, ``set`` & ``tuple`` validation `#225`_
+* separate out ``validate_model`` method, allow errors to be returned along with valid values `#221`_
+
+v0.11.1 (2018-07-02)
+....................
+* support Python 3.7 `#216`_, thanks `@layday`_
+* Allow arbitrary types in model `#209`_, thanks `@oldPadavan`_
+
+v0.11.0 (2018-06-28)
+....................
+* make ``list``, ``tuple`` and ``set`` types stricter `#86`_
+* **breaking change**: remove msgpack parsing `#201`_
+* add ``FilePath`` and ``DirectoryPath`` types `#10`_
+* model schema generation `#190`_
+* JSON serialisation of models and schemas `#133`_
+
+v0.10.0 (2018-06-11)
+....................
+* add ``Config.allow_population_by_alias`` `#160`_, thanks `@bendemaree`_
+* **breaking change**: new errors format `#179`_, thanks `@Gr1N`_
+* **breaking change**: removed ``Config.min_number_size`` and ``Config.max_number_size`` `#183`_, thanks `@Gr1N`_
+* **breaking change**: correct behaviour of ``lt`` and ``gt`` arguments to ``conint`` etc. `#188`_
+  for the old behaviour use ``le`` and ``ge`` `#194`_, thanks `@jaheba`_
+* added error context and ability to redefine error message templates using ``Config.error_msg_templates`` `#183`_,
+  thanks `@Gr1N`_
+* fix typo in validator exception `#150`_
+* copy defaults to model values, so different models don't share objects `#154`_
+
+v0.9.1 (2018-05-10)
+...................
+* allow custom ``get_field_config`` on config classes `#159`_
+* add ``UUID1``, ``UUID3``, ``UUID4`` and ``UUID5`` types `#167`_, thanks `@Gr1N`_
+* modify some inconsistent docstrings and annotations `#173`_, thanks `@YannLuo`_
+* fix type annotations for exotic types `#171`_, thanks `@Gr1N`_
+* re-use type validators in exotic types `#171`_
+* scheduled monthly requirements updates `#168`_
+* add ``Decimal``, ``ConstrainedDecimal`` and ``condecimal`` types `#170`_, thanks `@Gr1N`_
+
+v0.9.0 (2018-04-28)
+...................
+* tweak email-validator import error message `#145`_
+* fix parse error of ``parse_date()`` and ``parse_datetime()`` when input is 0 `#144`_, thanks `@YannLuo`_
+* add ``Config.anystr_strip_whitespace`` and ``strip_whitespace`` kwarg to ``constr``,
+  by default values is ``False`` `#163`_, thanks `@Gr1N`_
+* add ``ConstrainedFloat``, ``confloat``, ``PositiveFloat`` and ``NegativeFloat`` types `#166`_, thanks `@Gr1N`_
+
+v0.8.0 (2018-03-25)
+...................
+* fix type annotation for ``inherit_config`` `#139`_
+* **breaking change**: check for invalid field names in validators `#140`_
+* validate attributes of parent models `#141`_
+* **breaking change**: email validation now uses
+  `email-validator <https://github.com/JoshData/python-email-validator>`_ `#142`_
+
+v0.7.1 (2018-02-07)
+...................
+* fix bug with ``create_model`` modifying the base class
+
+v0.7.0 (2018-02-06)
+...................
+* added compatibility with abstract base classes (ABCs) `#123`_
+* add ``create_model`` method `#113`_ `#125`_
+* **breaking change**: rename ``.config`` to ``.__config__`` on a model
+* **breaking change**: remove deprecated ``.values()`` on a model, use ``.dict()`` instead
+* remove use of ``OrderedDict`` and use simple dict `#126`_
+* add ``Config.use_enum_values`` `#127`_
+* add wildcard validators of the form ``@validate('*')`` `#128`_
+
+v0.6.4 (2018-02-01)
+...................
+* allow python date and times objects `#122`_
+
+v0.6.3 (2017-11-26)
+...................
+* fix direct install without ``README.rst`` present
+
+v0.6.2 (2017-11-13)
+...................
+* errors for invalid validator use
+* safer check for complex models in ``Settings``
+
+v0.6.1 (2017-11-08)
+...................
+* prevent duplicate validators, `#101`_
+* add ``always`` kwarg to validators, `#102`_
+
+v0.6.0 (2017-11-07)
+...................
+* assignment validation `#94`_, thanks petroswork!
+* JSON in environment variables for complex types, `#96`_
+* add ``validator`` decorators for complex validation, `#97`_
+* depreciate ``values(...)`` and replace with ``.dict(...)``, `#99`_
+
+v0.5.0 (2017-10-23)
+...................
+* add ``UUID`` validation `#89`_
+* remove ``index`` and ``track`` from error object (json) if they're null `#90`_
+* improve the error text when a list is provided rather than a dict `#90`_
+* add benchmarks table to docs `#91`_
+
+v0.4.0 (2017-07-08)
+...................
+* show length in string validation error
+* fix aliases in config during inheritance `#55`_
+* simplify error display
+* use unicode ellipsis in ``truncate``
+* add ``parse_obj``, ``parse_raw`` and ``parse_file`` helper functions `#58`_
+* switch annotation only fields to come first in fields list not last
+
+v0.3.0 (2017-06-21)
+...................
+* immutable models via ``config.allow_mutation = False``, associated cleanup and performance improvement `#44`_
+* immutable helper methods ``construct()`` and ``copy()`` `#53`_
+* allow pickling of models `#53`_
+* ``setattr`` is removed as ``__setattr__`` is now intelligent `#44`_
+* ``raise_exception`` removed, Models now always raise exceptions `#44`_
+* instance method validators removed
+* django-restful-framework benchmarks added `#47`_
+* fix inheritance bug `#49`_
+* make str type stricter so list, dict etc are not coerced to strings. `#52`_
+* add ``StrictStr`` which only always strings as input `#52`_
+
+v0.2.1 (2017-06-07)
+...................
+* pypi and travis together messed up the deploy of ``v0.2`` this should fix it
+
+v0.2.0 (2017-06-07)
+...................
+* **breaking change**: ``values()`` on a model is now a method not a property,
+  takes ``include`` and ``exclude`` arguments
+* allow annotation only fields to support mypy
+* add pretty ``to_string(pretty=True)`` method for models
+
+v0.1.0 (2017-06-03)
+...................
+* add docs
+* add history
+
+
+.. _#490: https://github.com/samuelcolvin/pydantic/issues/490
+.. _#315: https://github.com/samuelcolvin/pydantic/issues/315
+.. _#452: https://github.com/samuelcolvin/pydantic/issues/452
+.. _#209: https://github.com/samuelcolvin/pydantic/issues/209
+.. _#141: https://github.com/samuelcolvin/pydantic/issues/141
+.. _#102: https://github.com/samuelcolvin/pydantic/issues/102
+.. _@Hanaasagi: https://github.com/Hanaasagi
+.. _#213: https://github.com/samuelcolvin/pydantic/issues/213
+.. _#249: https://github.com/samuelcolvin/pydantic/issues/249
+.. _#373: https://github.com/samuelcolvin/pydantic/issues/373
+.. _#154: https://github.com/samuelcolvin/pydantic/issues/154
+.. _#408: https://github.com/samuelcolvin/pydantic/issues/408
+.. _#610: https://github.com/samuelcolvin/pydantic/issues/610
+.. _#264: https://github.com/samuelcolvin/pydantic/issues/264
+.. _#303: https://github.com/samuelcolvin/pydantic/issues/303
+.. _#495: https://github.com/samuelcolvin/pydantic/issues/495
+.. _@liiight: https://github.com/liiight
+.. _@bendemaree: https://github.com/bendemaree
+.. _@hmvp: https://github.com/hmvp
+.. _#472: https://github.com/samuelcolvin/pydantic/issues/472
+.. _#47: https://github.com/samuelcolvin/pydantic/issues/47
+.. _#391: https://github.com/samuelcolvin/pydantic/issues/391
+.. _#127: https://github.com/samuelcolvin/pydantic/issues/127
+.. _#94: https://github.com/samuelcolvin/pydantic/issues/94
+.. _#308: https://github.com/samuelcolvin/pydantic/issues/308
+.. _@nkonin: https://github.com/nkonin
+.. _#343: https://github.com/samuelcolvin/pydantic/issues/343
+.. _#140: https://github.com/samuelcolvin/pydantic/issues/140
+.. _@oldPadavan: https://github.com/oldPadavan
+.. _#349: https://github.com/samuelcolvin/pydantic/issues/349
+.. _@YannLuo: https://github.com/YannLuo
+.. _#434: https://github.com/samuelcolvin/pydantic/issues/434
+.. _#330: https://github.com/samuelcolvin/pydantic/issues/330
+.. _#89: https://github.com/samuelcolvin/pydantic/issues/89
+.. _#473: https://github.com/samuelcolvin/pydantic/issues/473
+.. _@atheuz: https://github.com/atheuz
+.. _@gangefors: https://github.com/gangefors
+.. _#406: https://github.com/samuelcolvin/pydantic/issues/406
+.. _#381: https://github.com/samuelcolvin/pydantic/issues/381
+.. _#122: https://github.com/samuelcolvin/pydantic/issues/122
+.. _#144: https://github.com/samuelcolvin/pydantic/issues/144
+.. _#150: https://github.com/samuelcolvin/pydantic/issues/150
+.. _@theenglishway: https://github.com/theenglishway
+.. _@Sean1708: https://github.com/Sean1708
+.. _#628: https://github.com/samuelcolvin/pydantic/issues/628
+.. _#163: https://github.com/samuelcolvin/pydantic/issues/163
+.. _#464: https://github.com/samuelcolvin/pydantic/issues/464
+.. _#616: https://github.com/samuelcolvin/pydantic/issues/616
+.. _#113: https://github.com/samuelcolvin/pydantic/issues/113
+.. _@samuelcolvin: https://github.com/samuelcolvin
+.. _#221: https://github.com/samuelcolvin/pydantic/issues/221
+.. _@je-l: https://github.com/je-l
+.. _#446: https://github.com/samuelcolvin/pydantic/issues/446
+.. _#55: https://github.com/samuelcolvin/pydantic/issues/55
+.. _@tigerwings: https://github.com/tigerwings
+.. _#86: https://github.com/samuelcolvin/pydantic/issues/86
+.. _#455: https://github.com/samuelcolvin/pydantic/issues/455
+.. _@Gaunt: https://github.com/Gaunt
+.. _#214: https://github.com/samuelcolvin/pydantic/issues/214
+.. _#216: https://github.com/samuelcolvin/pydantic/issues/216
+.. _#454: https://github.com/samuelcolvin/pydantic/issues/454
+.. _#254: https://github.com/samuelcolvin/pydantic/issues/254
+.. _@jarekkar: https://github.com/jarekkar
+.. _@somada141: https://github.com/somada141
+.. _#49: https://github.com/samuelcolvin/pydantic/issues/49
+.. _@sevaho: https://github.com/sevaho
+.. _@tyrylu: https://github.com/tyrylu
+.. _#188: https://github.com/samuelcolvin/pydantic/issues/188
+.. _#99: https://github.com/samuelcolvin/pydantic/issues/99
+.. _@HeavenVolkoff: https://github.com/HeavenVolkoff
+.. _#225: https://github.com/samuelcolvin/pydantic/issues/225
+.. _#205: https://github.com/samuelcolvin/pydantic/issues/205
+.. _#451: https://github.com/samuelcolvin/pydantic/issues/451
+.. _@koxudaxi: https://github.com/koxudaxi
+.. _#247: https://github.com/samuelcolvin/pydantic/issues/247
+.. _#96: https://github.com/samuelcolvin/pydantic/issues/96
+.. _#394: https://github.com/samuelcolvin/pydantic/issues/394
+.. _#403: https://github.com/samuelcolvin/pydantic/issues/403
+.. _#405: https://github.com/samuelcolvin/pydantic/issues/405
+.. _#309: https://github.com/samuelcolvin/pydantic/issues/309
+.. _#474: https://github.com/samuelcolvin/pydantic/issues/474
+.. _#375: https://github.com/samuelcolvin/pydantic/issues/375
+.. _@euri10: https://github.com/euri10
+.. _#397: https://github.com/samuelcolvin/pydantic/issues/397
+.. _#320: https://github.com/samuelcolvin/pydantic/issues/320
+.. _#465: https://github.com/samuelcolvin/pydantic/issues/465
+.. _#298: https://github.com/samuelcolvin/pydantic/issues/298
+.. _#334: https://github.com/samuelcolvin/pydantic/issues/334
+.. _#126: https://github.com/samuelcolvin/pydantic/issues/126
+.. _@cfkanesan: https://github.com/cfkanesan
+.. _#133: https://github.com/samuelcolvin/pydantic/issues/133
+.. _#173: https://github.com/samuelcolvin/pydantic/issues/173
+.. _#450: https://github.com/samuelcolvin/pydantic/issues/450
+.. _#115: https://github.com/samuelcolvin/pydantic/issues/115
+.. _@pilosus: https://github.com/pilosus
+.. _#132: https://github.com/samuelcolvin/pydantic/issues/132
+.. _#414: https://github.com/samuelcolvin/pydantic/issues/414
+.. _#318: https://github.com/samuelcolvin/pydantic/issues/318
+.. _#286: https://github.com/samuelcolvin/pydantic/issues/286
+.. _#160: https://github.com/samuelcolvin/pydantic/issues/160
+.. _@NoAnyLove: https://github.com/NoAnyLove
+.. _@hugoduncan: https://github.com/hugoduncan
+.. _@jasonkuhrt: https://github.com/jasonkuhrt
+.. _#388: https://github.com/samuelcolvin/pydantic/issues/388
+.. _#90: https://github.com/samuelcolvin/pydantic/issues/90
+.. _#560: https://github.com/samuelcolvin/pydantic/issues/560
+.. _#170: https://github.com/samuelcolvin/pydantic/issues/170
+.. _#550: https://github.com/samuelcolvin/pydantic/issues/550
+.. _#350: https://github.com/samuelcolvin/pydantic/issues/350
+.. _#142: https://github.com/samuelcolvin/pydantic/issues/142
+.. _#128: https://github.com/samuelcolvin/pydantic/issues/128
+.. _#10: https://github.com/samuelcolvin/pydantic/issues/10
+.. _#327: https://github.com/samuelcolvin/pydantic/issues/327
+.. _#277: https://github.com/samuelcolvin/pydantic/issues/277
+.. _#242: https://github.com/samuelcolvin/pydantic/issues/242
+.. _#562: https://github.com/samuelcolvin/pydantic/issues/562
+.. _@pfrederiks: https://github.com/pfrederiks
+.. _#101: https://github.com/samuelcolvin/pydantic/issues/101
+.. _#236: https://github.com/samuelcolvin/pydantic/issues/236
+.. _#444: https://github.com/samuelcolvin/pydantic/issues/444
+.. _@wongpat: https://github.com/wongpat
+.. _#632: https://github.com/samuelcolvin/pydantic/issues/632
+.. _@StephenBrown2: https://github.com/StephenBrown2
+.. _@potykion: https://github.com/potykion
+.. _#312: https://github.com/samuelcolvin/pydantic/issues/312
+.. _@JaewonKim: https://github.com/JaewonKim
+.. _#145: https://github.com/samuelcolvin/pydantic/issues/145
+.. _#279: https://github.com/samuelcolvin/pydantic/issues/279
+.. _#276: https://github.com/samuelcolvin/pydantic/issues/276
+.. _#179: https://github.com/samuelcolvin/pydantic/issues/179
+.. _#625: https://github.com/samuelcolvin/pydantic/issues/625
+.. _@cazgp: https://github.com/cazgp
+.. _#323: https://github.com/samuelcolvin/pydantic/issues/323
+.. _#595: https://github.com/samuelcolvin/pydantic/issues/595
+.. _#437: https://github.com/samuelcolvin/pydantic/issues/437
+.. _#348: https://github.com/samuelcolvin/pydantic/issues/348
+.. _#159: https://github.com/samuelcolvin/pydantic/issues/159
+.. _#371: https://github.com/samuelcolvin/pydantic/issues/371
+.. _#487: https://github.com/samuelcolvin/pydantic/issues/487
+.. _#575: https://github.com/samuelcolvin/pydantic/issues/575
+.. _#333: https://github.com/samuelcolvin/pydantic/issues/333
+.. _#352: https://github.com/samuelcolvin/pydantic/issues/352
+.. _#227: https://github.com/samuelcolvin/pydantic/issues/227
+.. _#52: https://github.com/samuelcolvin/pydantic/issues/52
+.. _@sommd: https://github.com/sommd
+.. _@Gr1N: https://github.com/Gr1N
+.. _#325: https://github.com/samuelcolvin/pydantic/issues/325
+.. _#305: https://github.com/samuelcolvin/pydantic/issues/305
+.. _#139: https://github.com/samuelcolvin/pydantic/issues/139
+.. _@kataev: https://github.com/kataev
+.. _@DanielOberg: https://github.com/DanielOberg
+.. _#548: https://github.com/samuelcolvin/pydantic/issues/548
+.. _#166: https://github.com/samuelcolvin/pydantic/issues/166
+.. _#621: https://github.com/samuelcolvin/pydantic/issues/621
+.. _@proofit404: https://github.com/proofit404
+.. _@nphyatt: https://github.com/nphyatt
+.. _#287: https://github.com/samuelcolvin/pydantic/issues/287
+.. _#58: https://github.com/samuelcolvin/pydantic/issues/58
+.. _@MrMrRobat: https://github.com/MrMrRobat
+.. _@primal100: https://github.com/primal100
+.. _@jaheba: https://github.com/jaheba
+.. _@YaraslauZhylko: https://github.com/YaraslauZhylko
+.. _#389: https://github.com/samuelcolvin/pydantic/issues/389
+.. _@mikegoodspeed: https://github.com/mikegoodspeed
+.. _#168: https://github.com/samuelcolvin/pydantic/issues/168
+.. _#606: https://github.com/samuelcolvin/pydantic/issues/606
+.. _#237: https://github.com/samuelcolvin/pydantic/issues/237
+.. _#167: https://github.com/samuelcolvin/pydantic/issues/167
+.. _@vlcinsky: https://github.com/vlcinsky
+.. _#201: https://github.com/samuelcolvin/pydantic/issues/201
+.. _@layday: https://github.com/layday
+.. _#171: https://github.com/samuelcolvin/pydantic/issues/171
+.. _#332: https://github.com/samuelcolvin/pydantic/issues/332
+.. _#573: https://github.com/samuelcolvin/pydantic/issues/573
+.. _#622: https://github.com/samuelcolvin/pydantic/issues/622
+.. _@dgasmith: https://github.com/dgasmith
+.. _#579: https://github.com/samuelcolvin/pydantic/issues/579
+.. _#304: https://github.com/samuelcolvin/pydantic/issues/304
+.. _#361: https://github.com/samuelcolvin/pydantic/issues/361
+.. _#612: https://github.com/samuelcolvin/pydantic/issues/612
+.. _#498: https://github.com/samuelcolvin/pydantic/issues/498
+.. _#594: https://github.com/samuelcolvin/pydantic/issues/594
+.. _#190: https://github.com/samuelcolvin/pydantic/issues/190
+.. _@erosennin: https://github.com/erosennin
+.. _#540: https://github.com/samuelcolvin/pydantic/issues/540
+.. _#396: https://github.com/samuelcolvin/pydantic/issues/396
+.. _#583: https://github.com/samuelcolvin/pydantic/issues/583
+.. _#567: https://github.com/samuelcolvin/pydantic/issues/567
+.. _#326: https://github.com/samuelcolvin/pydantic/issues/326
+.. _#97: https://github.com/samuelcolvin/pydantic/issues/97
+.. _#183: https://github.com/samuelcolvin/pydantic/issues/183
+.. _#517: https://github.com/samuelcolvin/pydantic/issues/517
+.. _#532: https://github.com/samuelcolvin/pydantic/issues/532
+.. _#504: https://github.com/samuelcolvin/pydantic/issues/504
+.. _@tiangolo: https://github.com/tiangolo
+.. _#409: https://github.com/samuelcolvin/pydantic/issues/409
+.. _#53: https://github.com/samuelcolvin/pydantic/issues/53
+.. _#125: https://github.com/samuelcolvin/pydantic/issues/125
+.. _#386: https://github.com/samuelcolvin/pydantic/issues/386
+.. _#311: https://github.com/samuelcolvin/pydantic/issues/311
+.. _#44: https://github.com/samuelcolvin/pydantic/issues/44
+.. _#194: https://github.com/samuelcolvin/pydantic/issues/194
+.. _#257: https://github.com/samuelcolvin/pydantic/issues/257
+.. _#123: https://github.com/samuelcolvin/pydantic/issues/123
+.. _#385: https://github.com/samuelcolvin/pydantic/issues/385
+.. _#293: https://github.com/samuelcolvin/pydantic/issues/293
+.. _#91: https://github.com/samuelcolvin/pydantic/issues/91
+.. _#398: https://github.com/samuelcolvin/pydantic/issues/398
+.. _#611: https://github.com/samuelcolvin/pydantic/issues/611
+.. _#335: https://github.com/samuelcolvin/pydantic/issues/335
+.. _#358: https://github.com/samuelcolvin/pydantic/issues/358
+.. _#572: https://github.com/samuelcolvin/pydantic/issues/572
+.. _#441: https://github.com/samuelcolvin/pydantic/issues/441
+.. _#338: https://github.com/samuelcolvin/pydantic/issues/338
+.. _@dmontagu: https://github.com/dmontagu
+.. _#592: https://github.com/samuelcolvin/pydantic/issues/592
+.. _#526: https://github.com/samuelcolvin/pydantic/issues/526
+.. _#269: https://github.com/samuelcolvin/pydantic/issues/269
+.. _#184: https://github.com/samuelcolvin/pydantic/issues/184
+
+

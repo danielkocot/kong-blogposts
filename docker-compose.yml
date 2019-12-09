@@ -66,5 +66,34 @@ services:
       test: ["CMD-SHELL","curl -I -s -L http://localhost:8000 || exit 1"]
       interval: 5s
       retries: 10
-      
+
+  konga-prepare:
+    image: pantsel/konga:next
+    container_name: konga-prepare
+    command: "-c prepare -a postgres -u postgresql://kong@kong-database:5432/konga_db"
+    networks:
+      - kong-blogposts
+    restart: on-failure
+    depends_on: 
+      - kong-database
+
+  konga:
+    image: pantsel/konga:latest
+    container_name: konga
+    restart: always
+    networks:
+      - kong-blogposts
+    environment:
+      - DB_ADAPTER=postgres
+      - DB_HOST=kong-database
+      - DB_USER=kong
+      - TOKEN_SECRET=km1GUr4RkcQD7DewhJPNXrCuZwcKmqjb
+      - DB_DATABASE=konga_db
+      - NODE_ENV=production
+      - NO_AUTH=true
+    depends_on:
+      - kong-database
+      - konga-prepare
+    ports:
+      - "1337:1337"
 
